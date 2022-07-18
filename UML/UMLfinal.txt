@@ -1,0 +1,76 @@
+@startuml
+
+class Questionnaire {
+	-titre: String
+	-nbQuestions: int
+	-questions: Question[]
+	-MONTHSTART_START: Date
+	-MONTHSTART_END: Date
+	-MONTHEND_START: Date
+	-MONTHEND_END: Date
+}
+
+abstract class Question {
+	-nom: String
+	+id: int
+}
+
+class QuestionSlider {
+	-min: int
+	-max: int
+}
+
+class QuestionChoixMultiple {
+	-nbChamps: int
+	-champs: Champ[]
+}
+
+class QuestionLibre {
+}
+
+abstract class Reponse {
+	-idUser: int
+	-idQuestion: int
+	-date: Date
+}
+
+class Utilisateur {
+	+idUser: int
+	-privilege: int
+}
+
+class ReponseSlider{
+	-value: int
+}
+
+class ReponseChoixMultiple {
+	-idChamp: int
+}
+
+class ReponseLibre {
+	-texte: String
+}
+
+class Champ {
+	-idChamp: int
+	-nom: String
+}
+
+Questionnaire "1" *-- "*" Question
+Question "1" - "*" Reponse
+
+Question <|-- QuestionSlider
+Question <|-- QuestionChoixMultiple
+Question <|-- QuestionLibre
+
+QuestionChoixMultiple "1" *-- "*" Champ
+
+Utilisateur "1" --o "*" Reponse
+
+
+Reponse <|-- ReponseSlider
+Reponse <|-- ReponseChoixMultiple
+Reponse <|-- ReponseLibre
+
+
+@enduml
