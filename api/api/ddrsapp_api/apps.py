@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class QuickstartConfig(AppConfig):
+class DdrsappApiConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'quickstart'
+    name = 'ddrsapp_api'

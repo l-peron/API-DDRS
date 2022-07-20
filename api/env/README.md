@@ -15,6 +15,14 @@ Ci dessous une liste des commandes effectuées, en suivant le [Quickstart DRF](h
 4. `pip install djangorestframework`
 5. `django-admin startproject api .`
 6. `cd api`
-7. `django-admin startapp quickstart`
+7. `django-admin startapp ddrsapp-api`
 
-*On possède désormais une architecture basique (quickstart) de Django*
+*On possède désormais une architecture basique de Django*
+
+## Synchronisation de la base de données
+
+`python manage.py migrate`
+
+## Création de Serializers
+
+On créera ici juste un serializer pour les users (pour l'instant, devra être fait pour chaque donnée envoyée/reçue).
