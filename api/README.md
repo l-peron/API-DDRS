@@ -14,14 +14,11 @@ Ci dessous une liste des commandes effectuées, en suivant le [Quickstart DRF](h
 3. `pip install django` (`pip` doit être installé)
 4. `pip install djangorestframework`
 5. `django-admin startproject api .`
-6. `cd api`
-7. `django-admin startapp ddrsapp-api`
+6. `python3 manage.py startapp ddrsapp_api`
 
 *On possède désormais une architecture basique de Django*
 
 ## Synchronisation de la base de données
-
-`python manage.py migrate`
 
 ## Création de Serializers
 

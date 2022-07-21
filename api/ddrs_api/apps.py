@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class DdrsappApiConfig(AppConfig):
+class DdrsApiConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'ddrsapp_api'
+    name = 'ddrs_api'
