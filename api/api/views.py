@@ -1,4 +1,5 @@
 from django.http import HttpResponse
+from ddrs_api.models import User
 
 def index(request):
     if request.user.is_authenticated:
