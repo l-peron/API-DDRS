@@ -18,8 +18,16 @@ Ci dessous une liste des commandes effectuées, en suivant le [Quickstart DRF](h
 
 *On possède désormais une architecture basique de Django*
 
-## Synchronisation de la base de données
+## Création des modèles
 
-## Création de Serializers
+On créer ici un modèle utilisateur ***très*** basique, qui sert d'exemple de base pour développer tout le reste.
 
-On créera ici juste un serializer pour les users (pour l'instant, devra être fait pour chaque donnée envoyée/reçue).
+## Création des serializers
+
+On créer pour chaque modèle un serializer (disponible sous `ddrs_api/serializers.py`), permettant de passer d'une modèle à sa version `JSON` et inversement. 
+
+**Attention :** on le fait ici seulement pour les utilisateurs, mais cela doit aussi être fait pour toutes les données susceptibles d'être transférées.
+
+## Création des vues
+
+On créer des vues (ou entry-points) pour les différentes requêtes. On choisit pour l'exemple une vue permettant de lister les utilisateurs (`users/`), et une autre permettant de regarder un utilisateur en particulier (`users/<id>`). Les vues sont dans `ddrs_api/views.py` et les urls correspondantes dans `ddrs_api/urls.py`.
