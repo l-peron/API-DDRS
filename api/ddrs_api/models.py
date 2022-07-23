@@ -59,7 +59,7 @@ class Utilisateur(models.Model):
 # 'Reponse' model
 class Reponse(models.Model):
     # Posted date
-    answer_date = models.TimeField()
+    answer_date = models.DateField()
     # Linked 'Utilisateur'
     # Many-to-one
     user_id = models.ForeignKey(Utilisateur, on_delete = models.CASCADE)
@@ -75,28 +75,29 @@ class ReponseSlider(Reponse):
     answer_value = models.IntegerField()
 
     # Linked 'Question'
-    # Many-to-one
-    question_id = models.ForeignKey(QuestionSlider, on_delete = models.CASCADE)
+    # One-to-one
+    question_id = models.OneToOneField(QuestionSlider, on_delete = models.CASCADE)
 
 # ReponseChoixMultiple model
 class ReponseChoixMultiple(Reponse):
     # Linked 'Question'
-    # Many-to-one
-    question_id = models.ForeignKey(QuestionChoixMultiple, on_delete = models.CASCADE)
+    # One-to-one
+    question_id = models.OneToOneField(QuestionChoixMultiple, on_delete = models.CASCADE)
 
 # RCMChamp model
 class RCMChamp(models.Model):
+    checked_boolean = models.BooleanField()
     # Linked 'ReponseChoixMultiple'
     # Many-to-one
     rcm_id = models.ForeignKey(ReponseChoixMultiple, on_delete = models.CASCADE)
     # Linked 'QCMChamp'
-    # Many-to-one
-    qcmchamp_id = models.ForeignKey(QCMChamp, on_delete = models.CASCADE)
+    # One-to-one
+    qcmchamp_id = models.OneToOneField(QCMChamp, on_delete = models.CASCADE)
 
 # ReponseLibre model
 class ReponseLibre(Reponse):
     # Input text answer
     answer_text = models.CharField(max_length=300)
     # Linked 'Question'
-    # Many-to-one
-    question_id = models.ForeignKey(QuestionLibre, on_delete = models.CASCADE)
+    # One-to-one
+    question_id = models.OneToOneField(QuestionLibre, on_delete = models.CASCADE)
