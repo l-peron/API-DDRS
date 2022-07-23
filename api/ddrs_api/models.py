@@ -86,7 +86,7 @@ class ReponseChoixMultiple(Reponse):
 
 # RCMChamp model
 class RCMChamp(models.Model):
-    checked_boolean = models.BooleanField()
+    checked_boolean = models.BooleanField(default=False)
     # Linked 'ReponseChoixMultiple'
     # Many-to-one
     rcm_id = models.ForeignKey(ReponseChoixMultiple, on_delete = models.CASCADE)
