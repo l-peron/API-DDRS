@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from ddrs_api.models import User
+from ddrs_api.models import Utilisateur
 
-class UserSerializer(serializers.ModelSerializer):
+class UtilisateurSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
+        model = Utilisateur
         fields = ['id', 'name_text']

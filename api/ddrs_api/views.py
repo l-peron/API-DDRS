@@ -2,17 +2,17 @@ from curses.ascii import HT
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
-from ddrs_api.models import User
-from ddrs_api.serializers import UserSerializer
+from ddrs_api.models import Utilisateur
+from ddrs_api.serializers import UtilisateurSerializer
 
 @csrf_exempt
 def user_list(request):
     """
-    List all users
+    List all Utilisateurs
     """
     if request.method == 'GET':
-        users = User.objects.all()
-        serializer = UserSerializer(users, many=True)
+        utilisateurs = Utilisateur.objects.all()
+        serializer = UtilisateurSerializer(utilisateurs, many=True)
         return JsonResponse(serializer.data, safe=False)
     
     # Error if not GET
@@ -21,15 +21,15 @@ def user_list(request):
 @csrf_exempt
 def user_detail(request, pk):
     """
-    Retrieve data about a specific user
+    Retrieve data about a specific Utilisateur
     """
     try:
-        user = User.objects.get(pk = pk)
-    except User.DoesNotExist:
+        utilisateur = Utilisateur.objects.get(pk = pk)
+    except Utilisateur.DoesNotExist:
         return HttpResponse(status = 404)
     
     if request.method == 'GET':
-        serializer = UserSerializer(user)
+        serializer = UtilisateurSerializer(utilisateur)
         return JsonResponse(serializer.data)
 
     # Error if not GET
