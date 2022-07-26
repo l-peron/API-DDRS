@@ -6,11 +6,11 @@ class Questionnaire(models.Model):
     title_text = models.CharField(max_length=100)
     # Timespans
     # Starting span
-    MONTHSTART_START = models.DateField()
-    MONTHSTART_END = models.DateField()
+    MONTHSTART_START = models.DateTimeField()
+    MONTHSTART_END = models.DateTimeField()
     # End span
-    MONTHEND_START = models.DateField()
-    MONTHEND_END = models.DateField()
+    MONTHEND_START = models.DateTimeField()
+    MONTHEND_END = models.DateTimeField()
 
 # Question model
 class Question(models.Model):
@@ -59,7 +59,7 @@ class Utilisateur(models.Model):
 # 'Reponse' model
 class Reponse(models.Model):
     # Posted date
-    answer_date = models.DateField()
+    answer_date = models.DateTimeField(null=True, blank=True)
     # Linked 'Utilisateur'
     # Many-to-one
     user_id = models.ForeignKey(Utilisateur, on_delete = models.CASCADE)
