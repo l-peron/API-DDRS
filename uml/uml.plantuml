@@ -1,0 +1,85 @@
+@startuml
+
+class Questionnaire {
++ title_text : CharField
++ MONTHSTART_START : DateField
++ MONTHSTART_END : DateField
++ MONTHEND_START : DateField
++ MONTHEND_END : DateField
+}
+
+abstract Question{
++ title_text : CharField
++ questionnaire_id : ForeignKey
+}
+
+Questionnaire "1" *-- "n" Question
+
+class QuestionSlider{
++ value_min : IntegerField
++ value_max : IntegerField
+}
+
+Question <|-- QuestionSlider
+
+class QuestionChoixMultiple{
+}
+
+Question <|-- QuestionChoixMultiple
+
+class QCMChamp{
++ title_text : CharField
++ question_id : ForeignKey
+}
+
+QuestionChoixMultiple "1" *-- QCMChamp
+
+class QuestionLibre{
+}
+
+Question <|-- QuestionLibre
+
+class Utilisateur{
++ name_text : CharField
++ privilege_int : PositiveIntegerField
+}
+
+abstract Reponse{
++ answer_date : DateField
++ user_id : ForeignKey
+}
+
+Utilisateur "1" *-- "n" Reponse
+
+class ReponseSlider{
++ answer_value : IntegerField
++ question_id : ForeignKey
+}
+
+Reponse <|-- ReponseSlider
+QuestionSlider "1" *-- "1" ReponseSlider
+
+class ReponseChoixMultiple{
++ question_id : ForeignKey
+}
+
+Reponse <|-- ReponseChoixMultiple
+QuestionChoixMultiple "1" *-- "1" ReponseChoixMultiple
+
+class RCMChamp{
++ checked_boolean : BooleanField
++ rcm_id : ForeignKey
++ qcmchamp_id : ForeignKey
+}
+
+ReponseChoixMultiple "1" *-- "n" RCMChamp
+QCMChamp "1" *-- "1" RCMChamp
+
+class ReponseLibre{
++ answer_text : CharField
++ question_id : ForeignKey
+}
+
+Reponse <|-- ReponseLibre
+QuestionLibre "1" *-- "1" ReponseLibre
+@enduml
