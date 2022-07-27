@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # 'Questionnaire' model
 class Questionnaire(models.Model):
@@ -49,20 +50,13 @@ class QuestionLibre(Question):
     # No specific thing (only uses the title)
     pass
 
-# User model
-class Utilisateur(models.Model):
-    # Name of the user
-    name_text = models.CharField(max_length=30)
-    # Privilege (simple user, admin, ...)
-    privilege_int = models.PositiveIntegerField()
-
 # 'Reponse' model
 class Reponse(models.Model):
     # Posted date
     answer_date = models.DateTimeField(null=True, blank=True)
-    # Linked 'Utilisateur'
+    # Linked 'User'
     # Many-to-one
-    user_id = models.ForeignKey(Utilisateur, on_delete = models.CASCADE)
+    user_id = models.ForeignKey(User, on_delete = models.CASCADE)
 
     # Declared as an abstract model
     class Meta:

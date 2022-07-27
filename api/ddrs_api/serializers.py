@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from ddrs_api.models import Utilisateur
+from django.contrib.auth.models import User
 
-class UtilisateurSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Utilisateur
-        fields = ['id', 'name_text']
+        model = User
+        fields = ['id', 'username']
