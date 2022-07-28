@@ -14,7 +14,7 @@ class UserSerializer(serializers.ModelSerializer):
 class QuestionSliderSerializer(serializers.ModelSerializer):
         class Meta:
                 model = QuestionSlider
-                fields = ['id', "title_text", "value_min", "value_max"]
+                fields = ['id', "title_text", "value_min", "value_max", "questionnaire_id"]
 
 
 # Serializer for QCMChamp
@@ -28,7 +28,7 @@ class QuestionChoixMultipleSerializer(serializers.ModelSerializer):
         champs = serializers.SerializerMethodField()
         class Meta:
                 model = QuestionChoixMultiple
-                fields = ['id', "title_text", "champs"]
+                fields = ['id', "title_text", "champs", "questionnaire_id"]
         # Used to retrieve referencing champs
         def get_champs(self, obj):
                 champs = QCMChamp.objects.filter(question_id = obj)
@@ -38,7 +38,7 @@ class QuestionChoixMultipleSerializer(serializers.ModelSerializer):
 class QuestionLibreSerializer(serializers.ModelSerializer):
         class Meta:
                 model = QuestionLibre
-                fields = ['id', "title_text"]
+                fields = ['id', "title_text", "questionnaire_id"]
 
 # Serializer for Questionnaire
 class QuestionnaireSerializer(serializers.ModelSerializer):

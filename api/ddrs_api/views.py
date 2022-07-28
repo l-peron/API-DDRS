@@ -84,8 +84,8 @@ class QuestionListByType(APIView):
         serialize = serializer(data=entry_data)
         if serialize.is_valid():
             serialize.save()
-            return JsonResponse(serialize.data, status=status.HTTP_201_CREATED)
-        return JsonResponse(serialize.errors, status=status.HTTP_400_BAD_REQUEST)
+            return HttpResponse(status=201)
+        return HttpResponse(status=400)
 
 
 class QuestionDetail(APIView):
@@ -117,4 +117,4 @@ class QuestionDetail(APIView):
         question = self.get_object(pk)
         if self.is_editable(question):
             snippet.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return HttpResponse(status=204)
