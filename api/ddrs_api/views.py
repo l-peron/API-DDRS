@@ -119,21 +119,35 @@ class QuestionDetail(APIView):
         i = QuestionDetail.names.index(type)
         try:
             return QuestionDetail.types[i].objects.get(pk = pk), QuestionDetail.serializers[i]
-        except Snippet.DoesNotExist:
-            raise HttpResponse(status = 404)
+        except QuestionDetail.types[i].DoesNotExist:
+            return None
 
-    def is_editable(self, question):
-        questionnaire = Questionnaire.objects.get(pk = question.questionnaire_id)
+    def is_editable(self, fk_id):
+        questionnaire = Questionnaire.objects.get(pk = 2)
         # Check if the related Questionnaire is on
         return not questionnaire.MONTHSTART_START <= timezone.now() <= questionnaire.MONTHSTART_END and not questionnaire.MONTHEND_START <= timezone.now() <= questionnaire.MONTHEND_END
 
-    def get(self, request, type, pk, format=None):
-        question, serial = self.get_object(type, pk)
-        serializer = serial(question)
-        return JsonResponse(serializer.data, safe=False)
+    def get(self, request, type, pk):
+        if not self.get_object(type, pk):
+            return HttpResponse(status=404)
+        question, serializer = self.get_object(type, pk)
+        serialize = serializer(question)
+        return JsonResponse(serialize.data, safe=False)
 
-    def delete(self, request, pk, format=None):
-        question = self.get_object(pk)
-        if self.is_editable(question):
-            snippet.delete()
+    def delete(self, request, type, pk):
+        if not self.get_object(type, pk):
+            return HttpResponse(status=404)
+        question = self.get_object(type, pk)[0]
+        if self.is_editable(question.questionnaire_id):
+            question.delete()
             return HttpResponse(status=204)
+
+    def patch(self, request, type, pk):
+        if not self.get_object(type, pk):
+            return HttpResponse(status=404)
+        question, serializer = self.get_object(type, pk)
+        serialize = serializer(question, data=request.data, partial=True)
+        if serialize.is_valid():
+            serialize.save()
+            return JsonResponse(code=201, data=serialize.data, safe=False)
+        return JsonResponse(code=400, data="wrong parameters")
