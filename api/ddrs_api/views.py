@@ -2,12 +2,10 @@ from curses.ascii import HT
 from django.http import HttpResponse, JsonResponse
 from rest_framework.parsers import JSONParser
 from django.views.decorators.csrf import csrf_exempt
-from datetime import datetime
+from django.utils import timezone
 from rest_framework.views import APIView
-from ddrs_api.models import Questionnaire
-from ddrs_api.models import Question, QuestionChoixMultiple, QuestionSlider, QuestionLibre
-from ddrs_api.serializers import QuestionnaireSerializer
-from ddrs_api.serializers import QuestionChoixMultipleSerializer, QuestionSliderSerializer, QuestionLibreSerializer
+from ddrs_api.models import Questionnaire, QuestionChoixMultiple, QuestionSlider, QuestionLibre
+from ddrs_api.serializers import QuestionnaireSerializer, QuestionChoixMultipleSerializer, QuestionSliderSerializer, QuestionLibreSerializer, QCMChampSerializer
 
 @csrf_exempt
 def questionnaires_list(request):
@@ -67,25 +65,46 @@ class QuestionListByType(APIView):
     names = [ 'slider', 'libre', 'qcm']
 
     def get_tools(self, type):
-        if type not in QuestionListByType.names:
-            return HttpResponse(status = 404)
         i = QuestionListByType.names.index(type)
         return QuestionListByType.types[i], QuestionListByType.serializers[i]
 
+    def is_addable(self, questionnaire_id):
+        questionnaire = Questionnaire.objects.get(pk = questionnaire_id)
+        # Check if the related Questionnaire is on
+        return not questionnaire.MONTHSTART_START <= timezone.now() <= questionnaire.MONTHSTART_END and not questionnaire.MONTHEND_START <= timezone.now() <= questionnaire.MONTHEND_END
+
     def get(self, request, type, format=None):
+        if type not in QuestionListByType.names:
+            return HttpResponse(status = 404)
         model, serializer = self.get_tools(type)
         questions = model.objects.all()
         serialize = serializer(questions, many=True)
         return JsonResponse(serialize.data, safe=False)
 
     def post(self, request, type, format=None):
+        if type not in QuestionListByType.names:
+            return HttpResponse(status = 404)
         entry_data = request.data
         serializer = self.get_tools(type)[1]
         serialize = serializer(data=entry_data)
-        if serialize.is_valid():
+        if serialize.is_valid() and self.is_addable(entry_data["questionnaire_id"]):
             serialize.save()
+            if type == "qcm":
+                return self.post_qcm(entry_data["champs"], serialize.data["id"])
             return HttpResponse(status=201)
         return HttpResponse(status=400)
+
+    def post_qcm(self, datas, question_id):
+        entry_data = {}
+        for title in datas:
+            entry_data["title_text"] = title
+            entry_data["question_id"] = question_id
+            serialize = QCMChampSerializer(data=entry_data)
+            if serialize.is_valid():
+                serialize.save()
+            else:
+                return HttpResponse(status=400)
+        return HttpResponse(status=201)
 
 
 class QuestionDetail(APIView):
@@ -106,7 +125,7 @@ class QuestionDetail(APIView):
     def is_editable(self, question):
         questionnaire = Questionnaire.objects.get(pk = question.questionnaire_id)
         # Check if the related Questionnaire is on
-        return not questionnaire.MONTHSTART_START <= datetime.now() <= questionnaire.MONTHSTART_END and not questionnaire.MONTHEND_START <= datetime.now() <= questionnaire.MONTHEND_END
+        return not questionnaire.MONTHSTART_START <= timezone.now() <= questionnaire.MONTHSTART_END and not questionnaire.MONTHEND_START <= timezone.now() <= questionnaire.MONTHEND_END
 
     def get(self, request, type, pk, format=None):
         question, serial = self.get_object(type, pk)
