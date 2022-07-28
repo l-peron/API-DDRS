@@ -1,4 +1,5 @@
 from django.db import models
+from polymorphic.models import PolymorphicModel
 from django.contrib.auth.models import User
 
 # 'Questionnaire' model
@@ -21,7 +22,6 @@ class Question(models.Model):
     # Many-to-one
     questionnaire_id = models.ForeignKey(Questionnaire, on_delete = models.CASCADE)
 
-    # Declared as an abstract model
     class Meta:
         abstract = True
 

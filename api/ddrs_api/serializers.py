@@ -15,7 +15,7 @@ class QuestionSliderSerializer(serializers.ModelSerializer):
         class Meta:
                 model = QuestionSlider
                 fields = ['id', "title_text", "value_min", "value_max"]
-        
+
 
 # Serializer for QCMChamp
 class QCMChampSerializer(serializers.ModelSerializer):
@@ -51,10 +51,9 @@ class QuestionnaireSerializer(serializers.ModelSerializer):
                 sliders = QuestionSlider.objects.filter(questionnaire_id=obj)
                 choix_multiple = QuestionChoixMultiple.objects.filter(questionnaire_id=obj)
                 libre = QuestionLibre.objects.filter(questionnaire_id=obj)
-                return { 
+                return {
                         "sliders" : QuestionSliderSerializer(sliders, many=True).data,
                         "choix_multiple" : QuestionChoixMultipleSerializer(choix_multiple, many=True).data,
                         "libre" : QuestionLibreSerializer(libre, many=True).data
 
                 }
-
