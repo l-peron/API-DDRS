@@ -1,0 +1,9 @@
+stages:
+   - deploy
+
+deploy:
+   stage: deploy
+#   only: [ master ]
+   script:
+     - chmod +x deploy.sh
+     - ./deploy.sh
