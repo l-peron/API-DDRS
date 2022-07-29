@@ -3,19 +3,19 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from ddrs_api.serializers import UserSerializer
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
 
-@csrf_exempt
-def user_list(request):
+class user_list(APIView):
     """
     List all Users
     """
-    if request.method == 'GET':
+    permissions_classes = [IsAuthenticated]
+
+    def get(self, request):
         utilisateurs = User.objects.all()
         serializer = UserSerializer(utilisateurs, many=True)
         return JsonResponse(serializer.data, safe=False)
-    
-    # Error if not GET
-    return HttpResponse(status = 400)
 
 @csrf_exempt
 def user_detail(request, pk):
