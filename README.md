@@ -1,3 +1,5 @@
+[![pipeline status](https://gitlab.utc.fr/pr-ddrs-50ans/ddrsapp-back/badges/main/pipeline.svg)](https://gitlab.utc.fr/pr-ddrs-50ans/ddrsapp-back/-/commits/main)
+
 # Appli mobile PR DDRS 50 ans
 
 ## Architecture

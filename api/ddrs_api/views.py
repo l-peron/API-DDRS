@@ -1,4 +1,3 @@
-from curses.ascii import HT
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
@@ -13,7 +12,7 @@ def user_list(request):
         utilisateurs = User.objects.all()
         serializer = UserSerializer(utilisateurs, many=True)
         return JsonResponse(serializer.data, safe=False)
-    
+
     # Error if not GET
     return HttpResponse(status = 400)
 
