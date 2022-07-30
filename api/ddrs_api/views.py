@@ -10,26 +10,21 @@ class user_list(APIView):
     """
     List all Users
     """
-    permissions_classes = [IsAuthenticated]
-
-    def get(self, request):
+    def post(self, request):
         utilisateurs = User.objects.all()
         serializer = UserSerializer(utilisateurs, many=True)
         return JsonResponse(serializer.data, safe=False)
 
-@csrf_exempt
-def user_detail(request, pk):
-    """
-    Retrieve data about a specific Utilisateur
-    """
-    try:
-        utilisateur = User.objects.get(pk = pk)
-    except User.DoesNotExist:
-        return HttpResponse(status = 404)
-    
-    if request.method == 'GET':
+class user_detail(APIView):
+    def post(self, request, *args, **kwargs):
+        """
+        Retrieve data about a specific Utilisateur
+        """
+        try:
+            utilisateur = User.objects.get(pk = kwargs['pk'])
+        except User.DoesNotExist:
+            return HttpResponse(status = 404)
+
         serializer = UserSerializer(utilisateur)
         return JsonResponse(serializer.data)
-
-    # Error if not GET
-    return HttpResponse(status = 400)
+    
