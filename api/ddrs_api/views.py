@@ -1,9 +1,7 @@
 from curses.ascii import HT
 from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from ddrs_api.serializers import UserSerializer
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
 class user_list(APIView):
@@ -27,4 +25,3 @@ class user_detail(APIView):
 
         serializer = UserSerializer(utilisateur)
         return JsonResponse(serializer.data)
-    

@@ -11,14 +11,8 @@ JWT_ENCODE_HANDLER = api_settings.JWT_ENCODE_HANDLER
 
 class APILoginView(cas_views.LoginView):
     def successful_login(self, request: HttpRequest, next_page: str) -> HttpResponse:
-        """
-        This method is called on successful login.
-        Overriden to render a page that send JWT token via postMessage
-        if the page receive a message from one of the whitelisted origin.
-        """
-        user = request.user
-
         return HttpResponseRedirect('/getToken/')
+
 class getToken(View):
     def get(self, request : HttpRequest):
         if request.user.is_authenticated:
@@ -26,6 +20,8 @@ class getToken(View):
             # payload = JWT_PAYLOAD_HANDLER(user)
             # token = JWT_ENCODE_HANDLER(payload)
             refresh = RefreshToken.for_user(user)
+
+            print(user.is_superuser)
 
             return JsonResponse({
                 'refresh': str(refresh),
