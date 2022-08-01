@@ -1,0 +1,49 @@
+[
+    {
+        "model": "ddrs_api.questionslider",
+        "pk": 1,
+        "fields": {
+            "title_text": "exemple de slider",
+            "questionnaire_id": 1,
+            "value_min": 0,
+            "value_max": 100
+        }
+    },
+    {
+        "model": "ddrs_api.questionchoixmultiple",
+        "pk": 2,
+        "fields": {
+            "title_text": "exemple de choix multiple",
+            "questionnaire_id": 1
+        }
+    },
+    {
+        "model": "ddrs_api.qcmchamp",
+        "fields": {
+            "title_text": "reponse A",
+            "question_id": 2
+        }
+    },
+    {
+        "model": "ddrs_api.qcmchamp",
+        "fields": {
+            "title_text": "reponse B",
+            "question_id": 2
+        }
+    },
+    {
+        "model": "ddrs_api.qcmchamp",
+        "fields": {
+            "title_text": "reponse C",
+            "question_id": 2
+        }
+    },
+    {
+        "model": "ddrs_api.questionlibre",
+        "pk": 1,
+        "fields": {
+            "title_text": "exemple de libre",
+            "questionnaire_id": 1
+        }
+    }
+]
