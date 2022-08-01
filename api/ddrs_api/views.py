@@ -39,18 +39,10 @@ def questionnaire_detail(request, pk):
     # Error if not GET
     return HttpResponse(status = 400)
 
-def index(request):
-    if request.user.is_authenticated:
-        return HttpResponse('<p>Welcome to <a href="https://djangocas.dev">django-cas-ng</a>.</p><p>You logged in as <strong>%s</strong>.</p><p><a href="/accounts/logout">Logout</a></p>' % request.user)
-    else:
-        return HttpResponse('<p>Welcome to <a href="https://djangocas.dev">django-cas-ng</a>.</p><p><a href="/accounts/login">Login</a></p>')
-
 class QuestionList(APIView):
     """
     List all Questions
     """
-
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     types = [ QuestionSlider, QuestionLibre, QuestionChoixMultiple]
     serializers = [ QuestionSliderSerializer, QuestionLibreSerializer, QuestionChoixMultipleSerializer]
@@ -68,8 +60,6 @@ class QuestionListByType(APIView):
     """
     List all Questions or create new question by type
     """
-
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     types = [ QuestionSlider, QuestionLibre, QuestionChoixMultiple]
     serializers = [ QuestionSliderSerializer, QuestionLibreSerializer, QuestionChoixMultipleSerializer]
@@ -122,8 +112,6 @@ class QuestionDetail(APIView):
     """
     Retrieve, update or delete a Question
     """
-
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     types = [ QuestionSlider, QuestionLibre, QuestionChoixMultiple]
     serializers = [ QuestionSliderSerializer, QuestionLibreSerializer, QuestionChoixMultipleSerializer]
