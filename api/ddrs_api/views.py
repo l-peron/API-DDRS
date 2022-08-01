@@ -18,31 +18,15 @@ class questionnaires_list(APIView):
     def post(self, request):
         """
         Creates a Questionnaire with received fields and return its informations
-        
-        Infos are received following this format :
-        {
-            'title_text' : String,
-            'MONTHSTART_START' : Date,
-            'MONTHSTART_END' : Date,
-            'MONTHEND_START' : Date,
-            'MONTHEND_END' : Date
-        }
         """
-        post_data = json.loads(request.body)
+        post_data = request.data
 
         try:
-            questionnaire = Questionnaire(
-                title_text = post_data['title_text'], 
-                MONTHSTART_START = post_data['MONTHSTART_START'],
-                MONTHSTART_END = post_data['MONTHSTART_END'],
-                MONTHEND_START = post_data['MONTHEND_START'],
-                MONTHEND_END = post_data['MONTHEND_END']
-            )
-
-            questionnaire.save()
-            serializer = QuestionnaireSerializer(questionnaire)
-            
-            return JsonResponse(serializer.data)
+            serializer = QuestionnaireSerializer(data = post_data)
+            if serializer.is_valid():
+                serializer.save()
+                return JsonResponse(serializer.data)
+            return HttpResponse(status = 400)
         except KeyError:
             # 400 Bad Request
             return HttpResponse(status = 400)
