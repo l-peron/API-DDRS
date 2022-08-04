@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
 # 'Questionnaire' model
 class Questionnaire(models.Model):
     # Title of the 'questionnaire'
@@ -52,8 +53,8 @@ class QuestionLibre(Question):
 
 # 'Reponse' model
 class Reponse(models.Model):
-    # Posted date
-    answer_date = models.DateTimeField(null=True, blank=True)
+    # Last modification date
+    answer_date = models.DateTimeField(auto_now=True)
     # Linked 'User'
     # Many-to-one
     user = models.ForeignKey(User, on_delete = models.CASCADE)
