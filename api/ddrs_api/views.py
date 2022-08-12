@@ -1,8 +1,9 @@
 from curses.ascii import HT
 import json
+from django.db.utils import IntegrityError
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
-from ddrs_api.serializers import QuestionnaireSerializer, UserSerializer
+from ddrs_api.serializers import QuestionLibreSerializer, QuestionnaireSerializer, RCMChampSerializer, ReponseChoixMultipleSerializer, ReponseLibreSerializer, ReponseSliderSerializer, UserSerializer
 from rest_framework.views import APIView
 
 from django.contrib.auth.models import User
@@ -10,6 +11,27 @@ from ddrs_api.models import Questionnaire, Question
 from ddrs_api.models import QuestionSlider, QuestionChoixMultiple, QuestionLibre
 from ddrs_api.models import ReponseSlider, ReponseChoixMultiple, ReponseLibre
 from ddrs_api.models import User, RCMChamp, QCMChamp
+
+# USERS
+
+@csrf_exempt
+def user_detail(request, pk):
+    """
+    Retrieve data about a specific Utilisateur
+    """
+    try:
+        utilisateur = User.objects.get(pk = pk)
+    except User.DoesNotExist:
+        return HttpResponse(status = 404)
+
+    if request.method == 'GET':
+        serializer = UserSerializer(utilisateur)
+        return JsonResponse(serializer.data)
+
+    # Error if not GET
+    return HttpResponse(status = 400)
+
+# QUESTIONNAIRES
 
 class questionnaires_list(APIView):
     def get(self, request):
@@ -77,136 +99,189 @@ class questionnaire_detail(APIView):
         questionnaire.delete()
         return HttpResponse(status = 200)
 
-@csrf_exempt
-def user_detail(request, pk):
-    """
-    Retrieve data about a specific Utilisateur
-    """
-    try:
-        utilisateur = User.objects.get(pk = pk)
-    except User.DoesNotExist:
-        return HttpResponse(status = 404)
+# REPONSES (GENERAL)
 
-    return render(request, 'ddrs_api/detail.html', {'questions': questions})
-    
+class reponse_list(APIView):
 
-    if request.method == 'GET':
-        serializer = UserSerializer(utilisateur)
-        return JsonResponse(serializer.data)
+    types = [ ReponseSlider, ReponseLibre, ReponseChoixMultiple]
+    serializers = [ ReponseSliderSerializer, ReponseLibreSerializer, ReponseChoixMultipleSerializer ]
+    names = [ 'slider', 'libre' , 'qcm' ]
 
-    # Error if not GET
-    return HttpResponse(status = 400)
+    def get(self, request, format=None):
+        """
+        List all Reponse
+        """
+        datas = {}
+        for type, serial,name in zip(reponse_list.types, reponse_list.serializers, reponse_list.names):
+            questions = type.objects.all()
+            datas[name] = serial(questions, many=True).data
+        # Merging
+        return JsonResponse(datas, safe=False)
 
-@csrf_exempt
-def reponse_libre(request):
-    """
-    Requests are (for now) thought to be formatted like so:
-    data={
-        user_id: int,
-        question_id: int,
-        answer_text: string,
-    }
-    """
-    if request.method == 'POST':
-        question_id = request.POST.get('question_id')
-        # user_id = request.POST.get('user_id')
-        answer_text = request.POST.get('answer_text')
+# REPONSES LIBRES
 
-        # user = User.objects.get(pk=user_id)
+class reponse_libre_list(APIView):
+    def get(self, request):
+        """
+        List all Reponse Libre
+        """
+        reponses = ReponseLibre.objects.all()
+        serializer = ReponseLibreSerializer(reponses, many=True)
+        return JsonResponse(serializer.data, safe=False)
+
+    def post(self, request):
+        """
+        Creates (doesn't update) a reponse libre
+        """
+        post_data = request.data
+        # when JWT is merged it will be
+        # user = request.user
+        # for now we put the user in the request
 
         try:
-            existing_entry = ReponseLibre.objects.get(question=question_id) # user=user
-            if existing_entry:
-                existing_entry.answer_text = answer_text
-                existing_entry.save()
-                # Not sure if the user should be redirected or if it should just return a flag to indicate whether or not the query was successful
-                return HttpResponse(status=201)
+            user_id = post_data['user_id']
+            # If entry already exists -> error :
+            # updates are meant to be made via PUT
+            ReponseLibre.objects.get(question_id = post_data['question_id'], user_id = user_id) # user=user
+            return HttpResponse(status = 400, reason = "Duplicate question")
         except ReponseLibre.DoesNotExist:
-            question = QuestionLibre.objects.get(pk=question_id)
-            new_entry = ReponseLibre(answer_date=answer_date, answer_text=answer_text, question=question)
-            new_entry.save()
-            # Same here
-            return HttpResponse(status=201)
-    else:
-        return HttpResponse(status=400)
+            # Else we create a new entry
+            try:
+                serializer = ReponseLibreSerializer(data = post_data)
+                if serializer.is_valid(raise_exception = True):
+                    serializer.save()
+                    return HttpResponse(status = 201)
+                # 400 Bad Request
+                return HttpResponse(status = 400)
+            except IntegrityError:
+                # Integrity of db is not respected (unknown fk, null value,...)
+                # 400 Bad Request
+                return HttpResponse(status = 400)
+        except KeyError:
+            # 400 Bad Request
+            return HttpResponse(status = 400)
 
-@csrf_exempt
-def reponse_slider(request):
-    """
-    Requests are (for now) thought to be formatted like so:
-    data={
-        user_id: int,
-        question_id: int,
-        answer_value: int,
-    }
-    """
-    if request.method == 'POST':
-        # the request should contain all the following fields: answer_date, answer_value, question_id, user_id
-        question_id = request.POST.get('question_id')
-        # user_id = request.POST.get('user_id')
-        answer_value = int(request.POST.get('answer_value'))
+# REPONSES SLIDERS
 
-        # user = User.objects.get(pk=user_id)
+class reponse_slider_list(APIView):
+    def get(self, request):
+        """
+        List all Reponse Slider
+        """
+        reponses = ReponseSlider.objects.all()
+        serializer = ReponseSliderSerializer(reponses, many=True)
+        return JsonResponse(serializer.data, safe=False)
 
-        question = QuestionSlider.objects.get(pk=question_id)
-        min_value, max_value = question.value_min, question.value_max
-
-        if answer_value not in list(range(min_value, max_value + 1)):
-            return HttpResponse(status=400, reason=f"Value {answer_value} is out of allowed range({min_value}-{max_value})")
+    def post(self, request):
+        """
+        Creates (doesn't update) a reponse slider
+        """
+        post_data = request.data
+        # when JWT is merged it will be
+        # user = request.user
+        # for now we put the user in the request
 
         try:
-            existing_entry = ReponseSlider.objects.get(question=question_id)# user=user
-            if existing_entry:
-                existing_entry.answer_value = answer_value
-                existing_entry.save()
-                # Not sure if the user should be redirected or if it should just return a flag to indicate whether or not the query was successful
-                return HttpResponse(status=201)
+            question = QuestionSlider.objects.get(pk=post_data['question_id'])
+            min_value, max_value = question.value_min, question.value_max
+
+            answer_value = post_data['answer_value']
+
+            if answer_value not in list(range(min_value, max_value + 1)):
+                return HttpResponse(status=400, reason=f"Value {answer_value} is out of allowed range({min_value}-{max_value})")
+
+            user_id = post_data['user_id']
+
+            # If entry already exists -> error :
+            # updates are meant to be made via PUT
+            ReponseSlider.objects.get(question_id = post_data['question_id'], user_id = user_id) # user=user
+            return HttpResponse(status = 400, reason = "Duplicate question")
+        except QuestionSlider.DoesNotExist:
+            # 404 Not Found
+            return HttpResponse(status = 404, reason = f"Question with id {post_data['question_id']} not found")
         except ReponseSlider.DoesNotExist:
-            new_entry = ReponseSlider(answer_value=answer_value, question=question)
-            new_entry.save()
-            # Same here
-            return HttpResponse(status=201)
-    else:
-        return HttpResponse(status=400)
+            # Else we create a new entry
+            try:
+                serializer = ReponseSliderSerializer(data = post_data)
+                if serializer.is_valid(raise_exception = True):
+                    serializer.save()
+                    return HttpResponse(status = 201)
+                # 400 Bad Request
+                return HttpResponse(status = 400)
+            except IntegrityError:
+                # Integrity of db is not respected (unknown fk, null value,...)
+                # 400 Bad Request
+                return HttpResponse(status = 400)
+        except KeyError:
+            # 400 Bad Request
+            return HttpResponse(status = 400)
 
-@csrf_exempt
-def reponse_qcm(request):
-    """
-    Requests are (for now) thought to be formatted like so:
-    data={
-        user_id: int,
-        question_id: int,
-        selected_fields: list of IDs (i.e.: [1,3,4])
-    }
-    """
-    question_id = request.POST.get('question_id')
-    selected_fields = eval(request.POST.get('selected_fields'))
+# REPONSES QCM
 
-    question = QuestionChoixMultiple.objects.get(pk=question_id)
-    all_fields = [field.pk for field in question.qcmchamp_set.all()]
-    try:
-        existing_answer = ReponseChoixMultiple.objects.get(question=question_id) # user=user
-        linked_rcmchamps = existing_answer.rcmchamp_set.all()
-        if linked_rcmchamps:
-            for field in linked_rcmchamps:
-                field.checked_boolean = field.qcmchamp.pk in selected_fields
-                field.save()
-        else:
-            for field_id in all_fields:
-                qcmchamp = QCMChamp.objects.get(pk=field_id)
-                answer_bool = field_id in selected_fields
-                new_answer_field = RCMChamp(checked_boolean=answer_bool, rcm=existing_answer, qcmchamp=qcmchamp)
-                new_answer_field.save()
-        # Update 'last modified' date of answer
-        existing_answer.save()
-        return HttpResponse(status=201)
-    except ReponseChoixMultiple.DoesNotExist:
-        new_entry = ReponseChoixMultiple(question=question)
-        new_entry.save()
-        for field in all_fields:
-            qcmchamp = QCMChamp.objects.get(pk=field)
-            answer_bool = field.pk in selected_fields
-            new_answer_field = RCMChamp(checked_boolean=answer_bool, rcm=new_entry, qcmchamp=qcmchamp)
-            new_answer_field.save()
-        # Same here
-        return HttpResponse(status=201)
+class reponse_qcm_list(APIView):
+    def get(self, request):
+        """
+        List all Reponse Slider
+        """
+        reponses = ReponseChoixMultiple.objects.all()
+        serializer = ReponseChoixMultipleSerializer(reponses, many=True)
+        return JsonResponse(serializer.data, safe=False)
+
+    def post(self, request):
+        """
+        Creates (doesn't update) a reponse slider
+        """
+
+        post_data = request.data
+
+        # when JWT is merged it will be
+        # user = request.user
+        # for now we put the user in the request
+
+        """
+        Requests are (for now) thought to be formatted like so:
+        data={
+            user_id: int,
+            question_id: int,
+            selected_fields_ids: list of IDs (i.e.: [1,32,4])
+        }
+        """
+        try:
+            user_id = post_data['user_id']
+
+            # If entry already exists -> error :
+            # updates are meant to be made via PUT
+            ReponseChoixMultiple.objects.get(question_id = post_data['question_id'], user_id = user_id) # user=user
+            return HttpResponse(status = 400, reason = "Duplicate question")
+        except ReponseChoixMultiple.DoesNotExist:
+            # Else we create a new entry
+            try:
+                
+                serializer = ReponseChoixMultipleSerializer(data = post_data)
+                if serializer.is_valid(raise_exception = True):
+                    rcm_id = serializer.save().id
+                    
+                    selected_fields = post_data['selected_fields_ids']
+
+                    # For every selected answer
+                    for id in selected_fields:
+                        # Create a serializer for a RCMChamp
+                        field_serializer = RCMChampSerializer(
+                            data = {
+                                'rcm_id' : rcm_id, 
+                                'qcmchamp_id': id
+                                }
+                            )
+                        # Check if valid
+                        if field_serializer.is_valid():
+                            field_serializer.save()
+
+                    return HttpResponse(status = 201)
+                # 400 Bad Request
+                return HttpResponse(status = 400)
+            except IntegrityError:
+                # Integrity of db is not respected (unknown fk, null value,...)
+                # 400 Bad Request
+                return HttpResponse(status = 400)
+        except KeyError:
+            return HttpResponse(status = 400)
