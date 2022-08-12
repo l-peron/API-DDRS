@@ -9,5 +9,6 @@ urlpatterns = [
     path('reponses/', views.reponse_list.as_view()),
     path('reponses/libre/', views.reponse_libre_list.as_view()),
     path('reponses/slider/', views.reponse_slider_list.as_view()),
-    path('reponses/qcm/', views.reponse_qcm_list.as_view())
+    path('reponses/qcm/', views.reponse_qcm_list.as_view()),
+    path('reponses/<str:type>/<int:pk>/', views.reponse_detail.as_view())
 ]

@@ -118,6 +118,25 @@ class reponse_list(APIView):
         # Merging
         return JsonResponse(datas, safe=False)
 
+class reponse_detail(APIView):
+    types = [ ReponseSlider, ReponseLibre, ReponseChoixMultiple]
+    serializers = [ ReponseSliderSerializer, ReponseLibreSerializer, ReponseChoixMultipleSerializer ]
+    names = [ 'slider', 'libre' , 'qcm' ]
+
+    def get_object(self, type, pk):
+        i = reponse_detail.names.index(type)
+        try:
+            return reponse_detail.types[i].objects.get(pk = pk), reponse_detail.serializers[i]
+        except reponse_detail.types[i].DoesNotExist:
+            return None
+
+    def get(self, request, type, pk):
+        if not self.get_object(type, pk):
+            return HttpResponse(status=404)
+        question, serializer = self.get_object(type, pk)
+        serialize = serializer(question)
+        return JsonResponse(serialize.data, safe=False)
+
 # REPONSES LIBRES
 
 class reponse_libre_list(APIView):
