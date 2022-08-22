@@ -12,6 +12,10 @@ urlpatterns = [
     path('accounts/logout', django_cas_ng.views.LogoutView.as_view(), name='cas_ng_logout'),
     path('questionnaires/', views.questionnaires_list.as_view()),
     path('questionnaires/<int:pk>/', views.questionnaire_detail.as_view()),
+    path('users/<int:pk>/', views.user_detail),
+    path('reponse/libre/', views.reponse_libre),
+    path('reponse/slider/', views.reponse_slider),
+    path('reponse/qcm/', views.reponse_qcm)
     path('questions/', views.QuestionList.as_view()),
     path('questions/<str:type>/', views.QuestionListByType.as_view()),
     path('questions/<str:type>/<int:pk>/', views.QuestionDetail.as_view())
