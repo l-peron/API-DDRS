@@ -14,6 +14,7 @@ class Questionnaire(models.Model):
     MONTHEND_START = models.DateTimeField()
     MONTHEND_END = models.DateTimeField()
 
+
 # Question model
 class Question(models.Model):
     # Question
@@ -26,11 +27,13 @@ class Question(models.Model):
     class Meta:
         abstract = True
 
+
 # Every type of questions :
 # QuestionSlider model
 class QuestionSlider(Question):
     value_min = models.IntegerField()
     value_max = models.IntegerField()
+
 
 # QuestionChoixMultiple model
 class QuestionChoixMultiple(Question):
@@ -38,10 +41,11 @@ class QuestionChoixMultiple(Question):
     # but is referenced by 'champs'
     pass
 
+
 # QCMChamp model
 class QCMChamp(models.Model):
     # Possible answer
-    title_text = models.CharField(max_length = 100)
+    title_text = models.CharField(max_length=100)
     # Linked 'Question'
     # Many-to-one
     question = models.ForeignKey(QuestionChoixMultiple, on_delete = models.CASCADE)
@@ -50,6 +54,7 @@ class QCMChamp(models.Model):
 class QuestionLibre(Question):
     # No specific thing (only uses the title)
     pass
+
 
 # 'Reponse' model
 class Reponse(models.Model):
@@ -62,6 +67,7 @@ class Reponse(models.Model):
     # Declared as an abstract model
     class Meta:
         abstract = True
+
 
 # Every type of responses :
 # ReponseSlider model
