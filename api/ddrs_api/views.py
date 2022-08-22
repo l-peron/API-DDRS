@@ -4,12 +4,43 @@ from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
 from rest_framework.views import APIView
 from ddrs_api.serializers import QuestionnaireSerializer, QuestionChoixMultipleSerializer, QuestionSliderSerializer, \
-    QuestionLibreSerializer, QCMChampSerializer
+    QuestionLibreSerializer, QCMChampSerializer, UserSerializer
 from ddrs_api.models import Questionnaire, Question
 from ddrs_api.models import QuestionSlider, QuestionChoixMultiple, QuestionLibre
 from ddrs_api.models import ReponseSlider, ReponseChoixMultiple, ReponseLibre
 from ddrs_api.models import User, RCMChamp, QCMChamp
 
+
+@csrf_exempt
+def user_list(request):
+    """
+    List all Users
+    """
+    if request.method == 'GET':
+        utilisateurs = User.objects.all()
+        serializer = UserSerializer(utilisateurs, many=True)
+        return JsonResponse(serializer.data, safe=False)
+
+    # Error if not GET
+    return HttpResponse(status=400)
+
+
+@csrf_exempt
+def user_detail(request, pk):
+    """
+    Retrieve data about a specific Utilisateur
+    """
+    try:
+        utilisateur = User.objects.get(pk=pk)
+    except User.DoesNotExist:
+        return HttpResponse(status=404)
+
+    if request.method == 'GET':
+        serializer = UserSerializer(utilisateur)
+        return JsonResponse(serializer.data)
+
+    # Error if not GET
+    return HttpResponse(status=400)
 
 class questionnaires_list(APIView):
     def get(self, request):
