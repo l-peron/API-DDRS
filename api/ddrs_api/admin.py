@@ -1,15 +1,14 @@
+from django.apps import apps, AppConfig
 from django.contrib import admin
-from .models import *
 
-# Register your models here.
-admin.site.register(Questionnaire)
-admin.site.register(Question)
-admin.site.register(QuestionSlider)
-admin.site.register(QuestionChoixMultiple)
-admin.site.register(QCMChamp)
-admin.site.register(QuestionLibre)
-admin.site.register(Reponse)
-admin.site.register(ReponseSlider)
-admin.site.register(ReponseChoixMultiple)
-admin.site.register(RCMChamp)
-admin.site.register(ReponseLibre)
+
+class CustomApp(AppConfig):
+    name = 'ddrs_api'
+
+    def ready(self):
+        models = apps.get_models()
+        for model in models:
+            try:
+                admin.site.register(model)
+            except admin.sites.AlreadyRegistered:
+                pass
