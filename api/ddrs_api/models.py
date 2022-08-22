@@ -21,7 +21,7 @@ class Question(models.Model):
     title_text = models.CharField(max_length=300)
     # Linked 'questionnaire'
     # Many-to-one
-    questionnaire_id = models.ForeignKey(Questionnaire, on_delete=models.CASCADE)
+    questionnaire = models.ForeignKey(Questionnaire, on_delete = models.CASCADE)
 
     # Declared as an abstract model
     class Meta:
@@ -48,8 +48,7 @@ class QCMChamp(models.Model):
     title_text = models.CharField(max_length=100)
     # Linked 'Question'
     # Many-to-one
-    question_id = models.ForeignKey(QuestionChoixMultiple, on_delete=models.CASCADE)
-
+    question = models.ForeignKey(QuestionChoixMultiple, on_delete = models.CASCADE)
 
 # QuestionLibre model
 class QuestionLibre(Question):
@@ -59,11 +58,11 @@ class QuestionLibre(Question):
 
 # 'Reponse' model
 class Reponse(models.Model):
-    # Posted date
-    answer_date = models.DateTimeField(null=True, blank=True)
+    # Last modification date
+    answer_date = models.DateTimeField(auto_now=True)
     # Linked 'User'
     # Many-to-one
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete = models.CASCADE)
 
     # Declared as an abstract model
     class Meta:
@@ -78,26 +77,23 @@ class ReponseSlider(Reponse):
 
     # Linked 'Question'
     # One-to-one
-    question_id = models.OneToOneField(QuestionSlider, on_delete=models.CASCADE)
-
+    question = models.OneToOneField(QuestionSlider, on_delete = models.CASCADE)
 
 # ReponseChoixMultiple model
 class ReponseChoixMultiple(Reponse):
     # Linked 'Question'
     # One-to-one
-    question_id = models.OneToOneField(QuestionChoixMultiple, on_delete=models.CASCADE)
-
+    question = models.OneToOneField(QuestionChoixMultiple, on_delete = models.CASCADE)
 
 # RCMChamp model
 class RCMChamp(models.Model):
     checked_boolean = models.BooleanField(default=False)
     # Linked 'ReponseChoixMultiple'
     # Many-to-one
-    rcm_id = models.ForeignKey(ReponseChoixMultiple, on_delete=models.CASCADE)
+    rcm = models.ForeignKey(ReponseChoixMultiple, on_delete = models.CASCADE)
     # Linked 'QCMChamp'
     # One-to-one
-    qcmchamp_id = models.OneToOneField(QCMChamp, on_delete=models.CASCADE)
-
+    qcmchamp = models.OneToOneField(QCMChamp, on_delete = models.CASCADE)
 
 # ReponseLibre model
 class ReponseLibre(Reponse):
@@ -105,4 +101,4 @@ class ReponseLibre(Reponse):
     answer_text = models.CharField(max_length=300)
     # Linked 'Question'
     # One-to-one
-    question_id = models.OneToOneField(QuestionLibre, on_delete=models.CASCADE)
+    question = models.OneToOneField(QuestionLibre, on_delete = models.CASCADE)
