@@ -1,5 +1,4 @@
 from django.urls import path
-from django.contrib import admin
 import django_cas_ng.views
 from . import views
 
