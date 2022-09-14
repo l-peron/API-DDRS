@@ -30,14 +30,13 @@ ALLOWED_HOSTS = ["prddrs-50ans.int.utc.fr", "prddrs.test.utc.fr", ".localhost", 
 
 INSTALLED_APPS = [
     'ddrs_api.apps.DdrsApiConfig',
-    'django_cas_ng',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_cas_ng'
+    'django_cas_ng',
     'rest_framework',
 ]
 

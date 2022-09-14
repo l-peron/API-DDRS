@@ -12,11 +12,15 @@ Ci dessous une liste des commandes effectuées, en suivant le [Quickstart DRF](h
 *A partir de maintenant, nous sommes désormais dans un env. virtuel pour isoler les dépendances*
 
 3. `pip install django` (`pip` doit être installé)
-4. `pip install djangorestframework`
-5. `django-admin startproject api .`
-6. `python3 manage.py startapp ddrsapp_api`
+4. `pip install djangorestframework` (un framework pour simplifier le deploiement d'API REST)
+5. `pip install django-cas-ng` (un framework gérant les connexions CAS (simplifie la démarche))
+6. `pip install djangorestframework-simplejwt` (un framework gérant les JWT)
+7. `django-admin startproject api .`
+8. `python3 manage.py startapp ddrsapp_api`
 
 *On possède désormais une architecture basique de Django*
+
+Il est possible que des erreurs liées à `psycopg2` surviennent, dans ce cas là, `pip install psycopg2-binary` devrait régler le problème.
 
 ## Création des modèles
 

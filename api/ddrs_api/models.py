@@ -1,6 +1,6 @@
+from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import User
-
 
 # 'Questionnaire' model
 class Questionnaire(models.Model):
@@ -14,19 +14,16 @@ class Questionnaire(models.Model):
     MONTHEND_START = models.DateTimeField()
     MONTHEND_END = models.DateTimeField()
 
-
 # Question model
 class Question(models.Model):
     # Question
     title_text = models.CharField(max_length=300)
     # Linked 'questionnaire'
     # Many-to-one
-    questionnaire = models.ForeignKey(Questionnaire, on_delete = models.CASCADE)
+    questionnaire_id = models.ForeignKey(Questionnaire, on_delete = models.CASCADE)
 
-    # Declared as an abstract model
     class Meta:
         abstract = True
-
 
 # Every type of questions :
 # QuestionSlider model
@@ -34,40 +31,36 @@ class QuestionSlider(Question):
     value_min = models.IntegerField()
     value_max = models.IntegerField()
 
-
 # QuestionChoixMultiple model
 class QuestionChoixMultiple(Question):
     # No specific things
     # but is referenced by 'champs'
     pass
 
-
 # QCMChamp model
 class QCMChamp(models.Model):
     # Possible answer
-    title_text = models.CharField(max_length=100)
+    title_text = models.CharField(max_length = 100)
     # Linked 'Question'
     # Many-to-one
-    question = models.ForeignKey(QuestionChoixMultiple, on_delete = models.CASCADE)
+    question_id = models.ForeignKey(QuestionChoixMultiple, on_delete = models.CASCADE)
 
 # QuestionLibre model
 class QuestionLibre(Question):
     # No specific thing (only uses the title)
     pass
 
-
 # 'Reponse' model
 class Reponse(models.Model):
-    # Last modification date
-    answer_date = models.DateTimeField(auto_now=True)
+    # Posted date
+    answer_date = models.DateTimeField(default=timezone.now, null=True, blank=True)
     # Linked 'User'
     # Many-to-one
-    user = models.ForeignKey(User, on_delete = models.CASCADE)
+    user_id = models.ForeignKey(User, on_delete = models.CASCADE)
 
     # Declared as an abstract model
     class Meta:
         abstract = True
-
 
 # Every type of responses :
 # ReponseSlider model
@@ -76,41 +69,30 @@ class ReponseSlider(Reponse):
     answer_value = models.IntegerField()
 
     # Linked 'Question'
-    # One-to-one
-    question = models.OneToOneField(QuestionSlider, on_delete = models.CASCADE)
+    # Many-to-one
+    question_id = models.ForeignKey(QuestionSlider, on_delete = models.CASCADE)
 
 # ReponseChoixMultiple model
 class ReponseChoixMultiple(Reponse):
     # Linked 'Question'
-    # One-to-one
-    question = models.OneToOneField(QuestionChoixMultiple, on_delete = models.CASCADE)
+    # Many-to-one
+    question_id = models.ForeignKey(QuestionChoixMultiple, on_delete = models.CASCADE)
 
 # RCMChamp model
 class RCMChamp(models.Model):
-    checked_boolean = models.BooleanField(default=False)
+    # checked_boolean = models.BooleanField(default=False)
     # Linked 'ReponseChoixMultiple'
     # Many-to-one
-    rcm = models.ForeignKey(ReponseChoixMultiple, on_delete = models.CASCADE)
+    rcm_id = models.ForeignKey(ReponseChoixMultiple, on_delete = models.CASCADE)
     # Linked 'QCMChamp'
-    # One-to-one
-    qcmchamp = models.OneToOneField(QCMChamp, on_delete = models.CASCADE)
+    # Many-to-one
+    qcmchamp_id = models.ForeignKey(QCMChamp, on_delete = models.CASCADE)
 
 # ReponseLibre model
 class ReponseLibre(Reponse):
     # Input text answer
     answer_text = models.CharField(max_length=300)
     # Linked 'Question'
-    # One-to-one
-    question_id = models.OneToOneField(QuestionLibre, on_delete = models.CASCADE)
+    # Many-to-one
+    question_id = models.ForeignKey(QuestionLibre, on_delete = models.CASCADE)
 
-'''
-from django_cas_ng.signals import cas_user_authenticated
-@receiver(cas_user_authenticated)
-def save_user_attributes(user, attributes, **kwargs):
-    """Save user attributes from CAS into user and profile objects."""
-    try:
-        user = User.objects.get(email=user.email)
-    except User.DoesNotExist:
-        user = User.objects.create_user()
-'''
-        
