@@ -1,6 +1,7 @@
 from django.urls import path
 import django_cas_ng.views
 from . import views
+from . import admin_views
 
 urlpatterns = [
     path('users/', views.user_list),

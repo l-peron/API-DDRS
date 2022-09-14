@@ -101,4 +101,16 @@ class ReponseLibre(Reponse):
     answer_text = models.CharField(max_length=300)
     # Linked 'Question'
     # One-to-one
-    question = models.OneToOneField(QuestionLibre, on_delete = models.CASCADE)
+    question_id = models.OneToOneField(QuestionLibre, on_delete = models.CASCADE)
+
+'''
+from django_cas_ng.signals import cas_user_authenticated
+@receiver(cas_user_authenticated)
+def save_user_attributes(user, attributes, **kwargs):
+    """Save user attributes from CAS into user and profile objects."""
+    try:
+        user = User.objects.get(email=user.email)
+    except User.DoesNotExist:
+        user = User.objects.create_user()
+'''
+        
